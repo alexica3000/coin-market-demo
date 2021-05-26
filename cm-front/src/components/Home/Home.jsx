@@ -4,13 +4,21 @@ import api from "../../api";
 import {useEffect, useState} from "react";
 
 const Home = () => {
-    const [coins, setCoins] = useState([]);
+    const [coins, setCoins] = useState(null);
 
     useEffect(() => {
         api.getAllCoins().then((r) => {
             setCoins(r.data.data);
         });
     }, []);
+
+    const deleteCoin = (id) => {
+        api.deleteCoin(id).then(r => {
+            if (r.data.status) {
+                setCoins(prev => prev.filter(coin => coin.id !== id));
+            }
+        });
+    };
 
     const renderCoins = () => {
         if (!coins) {
@@ -30,7 +38,10 @@ const Home = () => {
                 <td>{coin.country}</td>
                 <td>
                     <Link to={`/edit/${coin.id}`} className="btn btn-warning mx-2">Edit</Link>
-                    <button className="btn btn-danger mx-2">Delete</button>
+                    <button
+                        className="btn btn-danger mx-2"
+                        onClick={() => deleteCoin(coin.id)}
+                    >Delete</button>
                 </td>
             </tr>
         ))
